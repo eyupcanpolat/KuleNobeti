@@ -134,7 +134,7 @@ namespace KuleNobeti
             float x = (width - w) / 2, y = height - h - 67;
             Panel(new Rect(x, y, w, h));
             Label(new Rect(x + 22, y + 13, 470, 35), "NÖBETÇİ SERA  /  ARŞİV", title, Mint);
-            Label(new Rect(x + 23, y + 56, w - 46, 42), "Telsiz notu: Tahliye gerekçeni ve insanları güvene nasıl alacağını anlat.", text, Amber);
+            Label(new Rect(x + 23, y + 56, w - 46, 42), "Telsiz: Acil durumu ve insanları nereye, nasıl götüreceğini tek mesajda anlat.", text, Amber);
             if (!string.IsNullOrEmpty(dialogue.LastInput))
                 Label(new Rect(x + 23, y + 100, w - 46, 44), "Sen: " + dialogue.LastInput, text, Color.white);
 
@@ -143,6 +143,8 @@ namespace KuleNobeti
                     ? (dialogue.HasError ? "Bağlantı: " : "Sera: ") + dialogue.Response
                     : "Nöbetçiyle kendi sözlerinle konuş.";
             if (world.ArchiveGate.IsOpen) answer += "\nKapı açık. Esc ile dön ve çıkışa ilerle.";
+            else if (!dialogue.Busy && !dialogue.HasError && !string.IsNullOrEmpty(dialogue.Response))
+                answer += "\nArşiv kapısı kilitli.";
             Label(new Rect(x + 23, y + 147, w - 46, 75), answer, text, dialogue.HasError ? Amber : Mint);
             Label(new Rect(x + 23, y + 277, w - 46, 28),
                 $"Yerel model: {model}  ·  Esc: kapat" +

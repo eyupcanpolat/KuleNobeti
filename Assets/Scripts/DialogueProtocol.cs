@@ -35,7 +35,7 @@ namespace KuleNobeti
 
     public interface IDialogueClient
     {
-        IEnumerator Generate(IReadOnlyList<ChatMessage> messages, Action<DialogueResult> finished);
+        IEnumerator Generate(IReadOnlyList<ChatMessage> messages, bool canConsiderOpening, Action<DialogueResult> finished);
     }
 
     public static class DialogueProtocol

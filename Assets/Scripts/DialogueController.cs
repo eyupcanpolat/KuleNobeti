@@ -43,18 +43,22 @@ namespace KuleNobeti
             Response = "";
             Busy = true;
             started = Time.realtimeSinceStartupAsDouble;
-            var messages = new List<ChatMessage> { new ChatMessage("system", prompt) };
+            bool eligible = EvacuationPolicy.CanConsiderOpening(line);
+            string rule = eligible
+                ? "\nOyun denetimi: Bu tur open_gate seçilebilir; kararını oyuncunun son mesajına göre ver."
+                : "\nOyun denetimi: Bu tur kapı kilitli kalır. action yalnızca none. Rol içinde kal ve tahliye bilgisine dön.";
+            var messages = new List<ChatMessage> { new ChatMessage("system", prompt + rule) };
             messages.AddRange(history);
             messages.Add(new ChatMessage("user", line));
-            StartCoroutine(SendRoutine(messages, line));
+            StartCoroutine(SendRoutine(messages, line, eligible));
         }
 
-        private IEnumerator SendRoutine(List<ChatMessage> messages, string line)
+        private IEnumerator SendRoutine(List<ChatMessage> messages, string line, bool eligible)
         {
-            yield return client.Generate(messages, result => Apply(result, line));
+            yield return client.Generate(messages, eligible, result => Apply(result, line, eligible));
         }
 
-        private void Apply(DialogueResult result, string line)
+        private void Apply(DialogueResult result, string line, bool eligible)
         {
             Busy = false;
             Latency = Time.realtimeSinceStartupAsDouble - started;
@@ -62,16 +66,22 @@ namespace KuleNobeti
             HasError = !result.Success;
             if (!result.Success) return;
 
+            if (result.Action == NpcAction.OpenGate && !EvacuationPolicy.AllowsOpening(eligible, result.Action))
+            {
+                Debug.LogWarning($"Arşiv kapısı: modelin açma isteği oyun kuralı tarafından reddedildi; {Latency:0.00} sn.");
+                return;
+            }
+
             history.Add(new ChatMessage("user", line));
             history.Add(new ChatMessage("assistant", result.RawContent));
             if (history.Count > 6) history.RemoveRange(0, 2);
 
-            if (result.Action == NpcAction.OpenGate)
+            if (EvacuationPolicy.AllowsOpening(eligible, result.Action))
             {
                 if (CanSpeak) archiveGate.Open();
                 else Response += " Onay alındı; kapı için nöbetçinin yanına dönüp yeniden konuş.";
             }
-            Debug.Log($"Diyalog sonucu: {result.Action}; {Latency:0.00} sn");
+            Debug.Log($"Diyalog sonucu: {result.Action}; kural uygun: {eligible}; kapı açık: {archiveGate.IsOpen}; {Latency:0.00} sn");
         }
     }
 }

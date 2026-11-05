@@ -72,7 +72,7 @@ namespace KuleNobeti
             schema = JObject.Parse(schemaText);
         }
 
-        public IEnumerator Generate(IReadOnlyList<ChatMessage> messages, Action<DialogueResult> finished)
+        public IEnumerator Generate(IReadOnlyList<ChatMessage> messages, bool canConsiderOpening, Action<DialogueResult> finished)
         {
             if (!settings.TryEndpoint(out string endpoint))
             {
@@ -80,12 +80,16 @@ namespace KuleNobeti
                 yield break;
             }
 
+            var responseFormat = (JObject)schema.DeepClone();
+            if (!canConsiderOpening)
+                responseFormat["properties"]["action"]["enum"] = new JArray("none");
+
             var body = new JObject
             {
                 ["model"] = settings.model,
                 ["messages"] = JArray.FromObject(messages),
                 ["stream"] = false,
-                ["format"] = schema.DeepClone(),
+                ["format"] = responseFormat,
                 ["options"] = new JObject { ["temperature"] = 0, ["num_predict"] = 180, ["num_ctx"] = 2048 }
             };
             byte[] bytes = Encoding.UTF8.GetBytes(body.ToString(Formatting.None));
