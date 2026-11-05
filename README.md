@@ -23,7 +23,7 @@ Bir servis kulesinde, oyuncu arşivdeki insanları güvenli alana çıkarmaya ç
 
    Sunucu erişilemiyorsa Ollama uygulamasını aç veya ayrı bir terminalde `ollama serve` çalıştır. Sunucu zaten açıksa ikinci kez çalıştırmak gerekmiyor.
 3. Unity'de **YazLab → 1 - Oyun Sahnesini Aç → Play**. Menü ilk kullanımda sahneyi ve palet varlığını kaydeder. Açılırken örnek Unity sahnesini kaydetmen gerekmez. İlk açılışta paketlerin indirilmesi ve derleme zaman alabilir.
-4. **WASD / oklar** hareket, **Q** şalter emri, **E** nöbetçinin yakınında konuşma, **Enter** gönder, **Esc** konuşmayı kapat. **F1/F2/F3** ilk kapı açılmadan önce ajanın test başlangıcını seçer; **F4** sensör verisini açar; **F8** oyunu sıfırlar.
+4. **WASD / oklar** hareket, **Q** şalter emri, **F** ilk kapıdan sonraki panellerde isteğe bağlı görev, **E** nöbetçinin yakınında konuşma, **Enter** gönder, **Esc** konuşmayı kapat. **F1/F2/F3** ilk kapı açılmadan önce ajanın test başlangıcını seçer; **F4** sensör verisini açar; **F8** panel durumları dahil oyunu sıfırlar. Görsel yenileme ve panel denemeleri: [İstasyon görevleri](docs/istasyon-gorevleri.md).
 5. Bellek veya gecikme nedeniyle gerekirse `ollama pull qwen2.5:1.5b` çalıştır. `ollama.example.json` dosyasını `ollama.local.json` adıyla kopyala ve model adını değiştir. Editörde proje köküne, Windows build'de EXE'nin yanına koy ve oyunu yeniden aç. Aynı modelle yeniden tüm diyalog testlerini yap. Takım arkadaşının Ollama'sı kullanılacaksa, sunucuyu aynı güvenilir ağdaki özel IPv4 adresinden erişilebilir yap ve o adresi `baseUrl` olarak ver. Varsayılan kurulum yerel `127.0.0.1:11434` kullanır.
 6. Girdi çalışmıyorsa **Edit → Project Settings → Player → Active Input Handling** ayarını **Input Manager (Old)** veya **Both** yap ve editörü yeniden başlat. Derleme hatasında Console'daki ilk kırmızı satırdan başla.
 
@@ -33,6 +33,7 @@ Bir servis kulesinde, oyuncu arşivdeki insanları güvenli alana çıkarmaya ç
 | --- | --- |
 | `StationWorld`, `StationGame` | Sahne geometrisini, NavMesh verisini ve bileşen bağlantılarını kurar; oyuncu çıkışa varınca oyunu bitirir. |
 | `PlayerMotor`, `StationHud` | Oyuncu hareketi, komutlar, metin girişi ve görsel durum göstergesi. |
+| `StationDecor`, `StationTasks` | Çarpışmasız tesis dekoru, kapı/sistem göstergeleri ve arşiv kuralından bağımsız havalandırma/telsiz görevleri. |
 | `CompanionAgent`, `CompanionSensor` | NavMesh rotası, durum geçişleri, öne ve hedefe Raycast, şalteri çalıştırma. |
 | `IDialogueClient`, `OllamaClient` | Ağ taşımasını diyalog yönetiminden ayırır; yerel Ollama'ya asenkron istek gönderir. |
 | `DialogueProtocol`, `DialogueController` | JSON alanlarını doğrular, konuşma geçmişini sınırlar ve modelin önerisini oyun durumuna uygular. |
@@ -183,8 +184,8 @@ Test kapsamı tek sahne, tek model ve her ajan başlangıcı için bir denemeyle
 
 ## 7. Build ve teslim
 
-- Unity'de **YazLab → 4 - Windows Build Al**. Çıktı `Builds/Windows/KuleNobeti.exe`; yanındaki `UnityPlayer.dll`, `KuleNobeti_Data` ve üretilen diğer dosyalarla birlikte çalışır. Ollama ve model ayrı kurulur. Oyun yerel model kurulu değilken hata gösterir; diyalogla bitiş için gerçek sunucu ve model gereklidir.
+- Unity'de **YazLab → 4 - Windows Build Al**. Yeni önizleme çıktısı `Builds/Windows-Istasyon/<tarih-saat>/KuleNobeti.exe`; önceden test edilmiş `Builds/Windows` korunur. EXE, yanındaki `UnityPlayer.dll`, `KuleNobeti_Data` ve üretilen diğer dosyalarla birlikte çalışır. Ollama ve model ayrı kurulur. Oyun yerel model kurulu değilken hata gösterir; diyalogla bitiş için gerçek sunucu ve model gereklidir.
 - Ortak GitHub reposuna `Assets` ve `.meta` dosyaları, `Packages`, `ProjectSettings`, `docs` ve tamamlanmış `README.md` girer. Ekip üyeleri kendi gerçek katkılarını kendi hesaplarından anlamlı commit'lerle paylaşır.
-- Proje kökünde `powershell -NoProfile -ExecutionPolicy Bypass -File .\Tools\TeslimPaketi.ps1` çalıştır. Üst klasöre `KuleNobeti_YazLab_Teslim.zip` üretir. Tek ZIP'te kaynak proje, rapor ve ekran görüntüleri ile tam Windows build bulunur. Son gönderimden önce ZIP'i açıp içeriklerini doğrula.
+- Proje kökünde `powershell -NoProfile -ExecutionPolicy Bypass -File .\Tools\TeslimPaketi.ps1` çalıştır. Üst klasöre `KuleNobeti_YazLab_Teslim.zip` üretir. Bu betik hâlâ önceden test edilmiş **Builds/Windows** klasörünü paketler; yeni önizleme otomatik olarak teslim yerine geçmez. Tek ZIP'te kaynak proje, rapor ve ekran görüntüleri ile tam Windows build bulunur. Son gönderimden önce ZIP'i açıp içeriklerini doğrula.
 
 Ekip için [PDF isterleri ve teslim kontrol listesi](docs/TeslimKontrol.md).

@@ -8,10 +8,13 @@ namespace KuleNobeti
         [SerializeField] private float speed = 5f;
         private CharacterController controller;
         private float verticalSpeed;
+        private StationTasks stationTasks;
         public bool HasFocusForDialogue { get; set; }
         public bool Finished { get; set; }
 
         private void Awake() => controller = GetComponent<CharacterController>();
+
+        internal void SetStationTasks(StationTasks tasks) => stationTasks = tasks;
 
         private void Update()
         {
@@ -28,7 +31,8 @@ namespace KuleNobeti
             if (direction.sqrMagnitude > .01f)
                 transform.rotation = Quaternion.LookRotation(direction);
             verticalSpeed = controller.isGrounded ? -2f : Mathf.Max(-25f, verticalSpeed - 22f * Time.deltaTime);
-            controller.Move((direction * speed + Vector3.up * verticalSpeed) * Time.deltaTime);
+            float movementSpeed = speed * (stationTasks != null && stationTasks.InHazard ? .48f : 1f);
+            controller.Move((direction * movementSpeed + Vector3.up * verticalSpeed) * Time.deltaTime);
         }
     }
 }

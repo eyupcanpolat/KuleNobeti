@@ -16,7 +16,6 @@ namespace KuleNobeti.Editor
     {
         private const string ScenePath = "Assets/Scenes/KuleNobeti.unity";
         private const string MaterialPath = "Assets/Scenes/KuleNobeti_Palette.mat";
-        private const string BuildPath = "Builds/Windows/KuleNobeti.exe";
 
         [MenuItem("YazLab/5 - Kapı Kuralı Kontrolleri")]
         public static void CheckEvacuationPolicy()
@@ -157,21 +156,20 @@ namespace KuleNobeti.Editor
                 throw new InvalidOperationException("Unity Hub'da bu editör için Windows Build Support kurulu olmalı.");
             if (!Application.isBatchMode && !EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
             EnsureScene();
-            PlayerSettings.companyName = "YazLab";
-            PlayerSettings.productName = "Kule Nöbeti";
-            PlayerSettings.defaultScreenWidth = 1280;
-            PlayerSettings.defaultScreenHeight = 800;
-            PlayerSettings.fullScreenMode = FullScreenMode.Windowed;
-            Directory.CreateDirectory(Path.GetDirectoryName(BuildPath));
+            // Keep the previously tested Windows delivery intact; every preview gets a new folder.
+            string buildPath = "Builds/Windows-Istasyon/" + DateTime.Now.ToString("yyyyMMdd-HHmmss") + "/KuleNobeti.exe";
+            if (Directory.Exists(Path.GetDirectoryName(buildPath)))
+                throw new InvalidOperationException("Bu önizleme klasörü zaten var: " + buildPath);
+            Directory.CreateDirectory(Path.GetDirectoryName(buildPath));
             var report = BuildPipeline.BuildPlayer(new BuildPlayerOptions {
                 scenes = new[] { ScenePath },
-                locationPathName = BuildPath,
+                locationPathName = buildPath,
                 target = BuildTarget.StandaloneWindows64,
                 options = BuildOptions.None
             });
             if (report.summary.result != BuildResult.Succeeded)
                 throw new InvalidOperationException("Windows build başarısız: " + report.summary.result);
-            Debug.Log("Windows build tamamlandı: " + Path.GetFullPath(BuildPath));
+            Debug.Log("Yeni Windows önizlemesi tamamlandı: " + Path.GetFullPath(buildPath));
         }
     }
 }

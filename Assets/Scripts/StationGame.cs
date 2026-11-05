@@ -29,7 +29,7 @@ namespace KuleNobeti
             view.transform.SetParent(transform);
             view.transform.rotation = Quaternion.Euler(54, 0, 0);
             view.clearFlags = CameraClearFlags.SolidColor;
-            view.backgroundColor = new Color(.035f, .06f, .10f);
+            view.backgroundColor = new Color(.025f, .029f, .028f);
             view.fieldOfView = 54f;
             view.transform.position = CameraTarget();
             gameObject.AddComponent<StationHud>().Configure(world, dialogue, config.model);
@@ -46,8 +46,11 @@ namespace KuleNobeti
             if (world.ArchiveGate.IsOpen && position.z >= 14.6f && Mathf.Abs(position.x) < 2.05f)
                 world.Player.Finished = true;
             if (Input.GetKeyDown(KeyCode.F8) || (world.Player.Finished && Input.GetKeyDown(KeyCode.R)))
-                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+                Restart();
         }
+
+        // F8 and the editor flow check use the same complete scene reset.
+        public void Restart() => SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
 
         private void OnDestroy() => world?.ReleaseNavigation();
     }

@@ -11,16 +11,17 @@ namespace KuleNobeti
         public Door PhysicalGate { get; private set; }
         public Door ArchiveGate { get; private set; }
         public Transform Guard { get; private set; }
+        public StationTasks Tasks { get; private set; }
 
         public static readonly Vector3 SwitchApproach = new Vector3(-2.65f, 0, 3.72f);
         public static readonly Vector3[] TestStarts = {
             new Vector3(-1.7f, 0, -8.7f), new Vector3(3.9f, 0, -10.8f), new Vector3(-5.9f, 0, -6.4f)
         };
 
-        private static readonly Color Floor = new Color(.24f, .30f, .37f);
-        private static readonly Color Walls = new Color(.18f, .24f, .32f);
-        private static readonly Color Orange = new Color(.99f, .62f, .22f);
-        private static readonly Color Mint = new Color(.23f, .89f, .73f);
+        private static readonly Color Floor = new Color(.105f, .12f, .125f);
+        private static readonly Color Walls = new Color(.18f, .205f, .21f);
+        private static readonly Color Orange = new Color(.76f, .57f, .19f);
+        private static readonly Color Mint = new Color(.70f, .68f, .54f);
         private readonly Material material;
         private readonly Transform root;
         private readonly List<NavMeshBuildSource> geometry = new List<NavMeshBuildSource>();
@@ -35,12 +36,13 @@ namespace KuleNobeti
 
         public void Build()
         {
-            RenderSettings.ambientLight = new Color(.54f, .61f, .70f);
+            RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Flat;
+            RenderSettings.ambientLight = new Color(.26f, .29f, .30f);
             var light = new GameObject("Tavan ışığı").AddComponent<Light>();
             light.transform.SetParent(root);
             light.type = LightType.Directional;
-            light.color = new Color(.88f, .94f, 1f);
-            light.intensity = 1.14f;
+            light.color = new Color(.90f, .93f, .94f);
+            light.intensity = .95f;
             light.shadows = LightShadows.Soft;
             light.transform.rotation = Quaternion.Euler(56, -38, 0);
 
@@ -57,7 +59,7 @@ namespace KuleNobeti
 
             Solid("Fiziksel bariyer / sol", -2.925f, 1.15f, 0, 3.15f, 2.3f, .76f, Walls);
             Solid("Fiziksel bariyer / sağ", 4.575f, 1.15f, 0, 6.45f, 2.3f, .76f, Walls);
-            PhysicalGate = Solid("Şalter kapısı", 0, 1.12f, 0, 2.74f, 2.24f, .68f, Orange)
+            PhysicalGate = Solid("Şalter kapısı", 0, 1.12f, 0, 2.74f, 2.24f, .68f, Walls)
                 .AddComponent<Door>();
             Solid("Arşiv duvarı / sol", -4.69f, 1.24f, 12, 6.62f, 2.48f, .85f, Walls);
             Solid("Arşiv duvarı / sağ", 4.69f, 1.24f, 12, 6.62f, 2.48f, .85f, Walls);
@@ -72,25 +74,13 @@ namespace KuleNobeti
                 Vector3.one * .24f, Orange, lever.transform);
             // Gövde şaltere yapılan Raycast'i karşılar, lamba yalnızca görseldir.
 
-            for (int i = -12; i <= 16; i += 2)
-            {
-                Visual("Zemin işareti", PrimitiveType.Cube, new Vector3(0, .012f, i),
-                    new Vector3(.075f, .02f, .75f), new Color(.48f, .58f, .68f), root);
-            }
-            for (int i = -4; i <= 4; i++)
-            {
-                Visual("Servis tüneli şeridi", PrimitiveType.Cube, new Vector3(-6.1f, .018f, i),
-                    new Vector3(.55f, .025f, .11f), Orange, root);
-            }
-            Visual("Çıkış alanı", PrimitiveType.Cube, new Vector3(0, .018f, 15.6f),
-                new Vector3(3.9f, .025f, 2.35f), Mint, root);
-            WorldSign("01  SERVİS KAPISI", new Vector3(0, 2.82f, -.67f), Orange);
-            WorldSign("02  ARŞİV", new Vector3(0, 2.85f, 11.3f), Mint);
-
             CreatePlayer();
             Guard = CreateGuard();
             CreateNavigation();
             CreateCompanion(lever.transform);
+            Tasks = root.gameObject.AddComponent<StationTasks>();
+            Tasks.Configure(Player, PhysicalGate);
+            root.gameObject.AddComponent<StationDecor>().Configure(root, material, PhysicalGate, ArchiveGate, Tasks);
         }
 
         public void ReleaseNavigation()
@@ -130,11 +120,15 @@ namespace KuleNobeti
             controller.center = new Vector3(0, .90f, 0);
             controller.stepOffset = .22f;
             Visual("Tulum", PrimitiveType.Capsule, new Vector3(0, .78f, 0),
-                new Vector3(.62f, .65f, .62f), new Color(.28f, .61f, 1f), hero.transform);
+                new Vector3(.62f, .65f, .62f), new Color(.70f, .65f, .48f), hero.transform);
             Visual("Kask", PrimitiveType.Sphere, new Vector3(0, 1.46f, .035f), Vector3.one * .45f,
-                new Color(.73f, .88f, 1f), hero.transform);
+                new Color(.91f, .82f, .54f), hero.transform);
             Visual("Vizör", PrimitiveType.Cube, new Vector3(0, 1.48f, .22f),
                 new Vector3(.28f, .115f, .095f), Walls, hero.transform);
+            Visual("Göğüs reflektörü", PrimitiveType.Cube, new Vector3(0, 1.02f, .28f),
+                new Vector3(.48f, .09f, .045f), new Color(.94f, .88f, .65f), hero.transform);
+            Visual("Bakım çantası", PrimitiveType.Cube, new Vector3(0, .95f, -.29f),
+                new Vector3(.38f, .48f, .18f), new Color(.23f, .27f, .26f), hero.transform);
             Player = hero.AddComponent<PlayerMotor>();
         }
 
@@ -143,10 +137,21 @@ namespace KuleNobeti
             var guard = new GameObject("Nöbetçi Sera").transform;
             guard.SetParent(root);
             guard.position = new Vector3(1.65f, 0, 9.2f);
-            Visual("Üniforma", PrimitiveType.Capsule, new Vector3(0, .8f, 0),
-                new Vector3(.65f, .75f, .65f), new Color(.57f, .43f, .88f), guard);
-            Visual("Kask", PrimitiveType.Sphere, new Vector3(0, 1.56f, 0), Vector3.one * .46f, Mint, guard);
-            WorldSign("NÖBETÇİ SERA", guard.position + Vector3.up * 2.3f, Mint);
+            Visual("Uzun nöbetçi paltosu", PrimitiveType.Cube, new Vector3(0, .88f, 0),
+                new Vector3(.76f, 1.20f, .46f), new Color(.18f, .235f, .22f), guard);
+            Visual("Omuzluk", PrimitiveType.Cube, new Vector3(0, 1.34f, 0),
+                new Vector3(.97f, .18f, .50f), new Color(.32f, .35f, .31f), guard);
+            Visual("Baş", PrimitiveType.Sphere, new Vector3(0, 1.64f, 0),
+                new Vector3(.37f, .43f, .37f), new Color(.67f, .57f, .43f), guard);
+            Visual("Siperli nöbetçi şapkası", PrimitiveType.Cube, new Vector3(0, 1.84f, .04f),
+                new Vector3(.54f, .13f, .58f), new Color(.16f, .20f, .18f), guard);
+            Visual("Nöbetçi rozeti", PrimitiveType.Cube, new Vector3(-.20f, 1.24f, .25f),
+                new Vector3(.12f, .15f, .035f), Orange, guard);
+            Visual("Sol çizme", PrimitiveType.Cube, new Vector3(-.22f, .19f, .06f),
+                new Vector3(.27f, .34f, .40f), Walls, guard);
+            Visual("Sağ çizme", PrimitiveType.Cube, new Vector3(.22f, .19f, .06f),
+                new Vector3(.27f, .34f, .40f), Walls, guard);
+            WorldSign("NÖBETÇİ SERA", guard.position + new Vector3(0, 2.15f, -.6f), new Color(.79f, .76f, .61f));
             return guard;
         }
 
@@ -166,11 +171,17 @@ namespace KuleNobeti
             agent.stoppingDistance = .12f;
             agent.autoBraking = true;
             Visual("Robot gövdesi", PrimitiveType.Cube, new Vector3(0, .34f, 0),
-                new Vector3(.64f, .52f, .61f), Mint, robot.transform);
+                new Vector3(.64f, .52f, .61f), new Color(.78f, .75f, .61f), robot.transform);
             Visual("Robot gözü", PrimitiveType.Cube, new Vector3(0, .47f, .33f),
                 new Vector3(.40f, .11f, .08f), Walls, robot.transform);
             Visual("Robot durum ışığı", PrimitiveType.Sphere, new Vector3(0, .65f, 0),
-                Vector3.one * .13f, Orange, robot.transform);
+                Vector3.one * .13f, new Color(.33f, .70f, .38f), robot.transform);
+            Visual("Sol palet", PrimitiveType.Cube, new Vector3(-.36f, .18f, 0),
+                new Vector3(.16f, .22f, .70f), Walls, robot.transform);
+            Visual("Sağ palet", PrimitiveType.Cube, new Vector3(.36f, .18f, 0),
+                new Vector3(.16f, .22f, .70f), Walls, robot.transform);
+            Visual("Sarı tanıma şeridi", PrimitiveType.Cube, new Vector3(0, .61f, 0),
+                new Vector3(.50f, .03f, .12f), Orange, robot.transform);
             Companion = robot.AddComponent<CompanionAgent>();
             Companion.Configure(Player.transform, lever, SwitchApproach, PhysicalGate);
         }
