@@ -81,6 +81,9 @@ namespace KuleNobeti
             Tasks = root.gameObject.AddComponent<StationTasks>();
             Tasks.Configure(Player, PhysicalGate);
             root.gameObject.AddComponent<StationDecor>().Configure(root, material, PhysicalGate, ArchiveGate, Tasks);
+            root.gameObject.AddComponent<ServiceRoomVisual>().Configure(root, material, PhysicalGate, lever.transform);
+            root.gameObject.AddComponent<StationCharacterVisuals>().Configure(Player.transform, Guard, Companion.transform, material);
+            root.gameObject.AddComponent<StationEquipmentVisuals>().Configure(root, material);
         }
 
         public void ReleaseNavigation()

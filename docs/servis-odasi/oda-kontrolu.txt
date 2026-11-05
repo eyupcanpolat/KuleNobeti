@@ -1,0 +1,17 @@
+﻿Kule Nobeti / Service room visual preview
+UTC: 2026-11-05T15:57:21.5780074Z
+Progress: COMPLETE
+Real production scene, camera, NavMesh, companion and sensor; no forced doors, dialogue, tasks or finish state.
+Player capture placement warps briefly disable CharacterController; no claim of physical WASD validation.
+05 is a temporary close-up for surface QA, not a production camera change. Other PNGs use the production follow camera.
+scene | PASS | Completed in Unity Play mode.
+materials | PASS | Completed in Unity Play mode.
+visual-colliders | PASS | Completed in Unity Play mode.
+human-visuals | PASS | Completed in Unity Play mode.
+01-baslangic | PASS | Completed in Unity Play mode.
+02-yan-duvar | PASS | Completed in Unity Play mode.
+real-robot-route | PASS | Completed in Unity Play mode.
+03-servis-kapisi | PASS | Completed in Unity Play mode.
+04-pano | PASS | Completed in Unity Play mode.
+05-pano-yakin | PASS | Completed in Unity Play mode.
+native-keys | UNTESTED | No physical Q/E/F/F1-F4/F8/R or WASD events synthesized; robot uses production Relocate/Order handlers.

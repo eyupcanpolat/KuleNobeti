@@ -88,17 +88,8 @@ namespace KuleNobeti
             FloorText("YALNIZ K-07", new Vector3(-6.18f, .043f, -6.15f), .066f, Yellow);
             Arrow(new Vector3(-6.18f, .036f, -7.45f), Yellow, .65f);
 
-            // Switch body remains the original raycast target. These parts cannot intercept it.
-            Box("Şalter taban plakası", new Vector3(-2.65f, .022f, 2.60f), new Vector3(1.15f, .025f, 1.02f), Metal);
-            Box("Şalter kolu", new Vector3(-2.65f, 1.19f, 2.58f), new Vector3(.10f, .39f, .10f), Steel);
-            Box("Şalter tutamağı", new Vector3(-2.65f, 1.36f, 2.58f), new Vector3(.42f, .13f, .16f), Yellow);
-            Sign("KAPI ŞALTERİ", new Vector3(-2.65f, 1.92f, 2.56f), 1.80f, .38f, Paper, .062f);
-            Cable("Şalter kapı kablosu", new Vector3(-2.65f, .06f, 2.2f), new Vector3(-2.65f, .06f, .7f), .065f, Metal);
-
-            // Wall seams and two useful service fixtures, rather than a repeated prop grid.
-            for (int i = 0; i < 4; i++)
-                Box("Krem duvar servis paneli", new Vector3(7.575f, 1.35f, -10.5f + i * 2.6f),
-                    new Vector3(.035f, 1.5f, 2.10f), Cream);
+            // The detailed switch cabinet and first-room wall skins are built by ServiceRoomVisual.
+            // Keep the identifying signs and fire equipment; first-room wall surfaces have their own skin.
             Sign("KULE NÖBETİ\nGECE VARDİYASI", new Vector3(4.9f, 2.28f, -12.9f), 3.4f, .86f, Paper, .084f);
             Box("Yangın dolabı", new Vector3(7.25f, .90f, -3.6f), new Vector3(.48f, 1.35f, .85f), Red);
             Box("Yangın dolabı kapağı", new Vector3(6.99f, .90f, -3.6f), new Vector3(.035f, 1.11f, .64f), Cream);

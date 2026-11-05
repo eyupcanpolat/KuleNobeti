@@ -12,11 +12,11 @@ namespace KuleNobeti
         private static readonly Color Charcoal = new Color(.085f, .095f, .09f);
         private StationWorld world;
         private DialogueController dialogue;
-        private string model, input = "", notice = "", displayedReply = "";
+        private string model, input = "", notice = "", displayedReply = "", displayedInput = "";
         private float noticeUntil;
         private bool chatOpen, focus, diagnostics;
-        private Vector2 chatScroll;
-        private GUIStyle title, text, small, heading, centered, centeredSmall, inputStyle, button;
+        private Vector2 chatScroll, playerMessageScroll;
+        private GUIStyle title, chatTitle, text, small, heading, centered, centeredSmall, inputStyle, button;
 
         public void Configure(StationWorld station, DialogueController npc, string modelName)
         {
@@ -77,6 +77,7 @@ namespace KuleNobeti
             if (title != null) return;
             title = new GUIStyle(GUI.skin.label)
                 { fontSize = 23, fontStyle = FontStyle.Bold, richText = false };
+            chatTitle = new GUIStyle(title) { fontSize = 18 };
             text = new GUIStyle(GUI.skin.label)
                 { fontSize = 16, wordWrap = true, richText = false };
             small = new GUIStyle(text) { fontSize = 13 };
@@ -165,10 +166,13 @@ namespace KuleNobeti
                 }
             }
 
-            Fill(new Rect(20, height - 43, width - 40, 27), new Color(Charcoal.r, Charcoal.g, Charcoal.b, .91f));
-            Label(new Rect(29, height - 42, width - 58, 25),
-                "WASD / oklar: yürü     Q: K-07     E: konuş     F: panel     F1–F3: ajan testi     F4: sensör     F8: sıfırla",
-                centeredSmall, Muted);
+            if (!chatOpen)
+            {
+                Fill(new Rect(20, height - 43, width - 40, 27), new Color(Charcoal.r, Charcoal.g, Charcoal.b, .91f));
+                Label(new Rect(29, height - 42, width - 58, 25),
+                    "WASD / oklar: yürü     Q: K-07     E: konuş     F: panel     F1–F3: ajan testi     F4: sensör     F8: sıfırla",
+                    centeredSmall, Muted);
+            }
         }
 
         private string ContextHint()
@@ -207,43 +211,53 @@ namespace KuleNobeti
 
         private void DrawChat(float width, float height)
         {
-            const float w = 710, h = 353;
-            float x = (width - w) / 2, y = height - h - 58;
+            const float h = 234;
+            float w = Mathf.Min(980, width - 40);
+            float x = (width - w) / 2, y = height - h - 16;
             Panel(new Rect(x, y, w, h), Yellow);
-            Label(new Rect(x + 20, y + 13, w - 40, 31), "NÖBETÇİ SERA  /  ARŞİV 02", title, Cream);
-            Label(new Rect(x + 21, y + 48, w - 42, 42),
-                "Acil durumu, insanları nereye ve nasıl tahliye edeceğini kendi sözlerinle anlat.", text, Yellow);
+            Label(new Rect(x + 16, y + 9, w - 270, 27), "NÖBETÇİ SERA  /  ARŞİV 02", chatTitle, Cream);
+            Fill(new Rect(x + w - 242, y + 9, 226, 26), new Color(.045f, .055f, .05f));
+            Label(new Rect(x + w - 233, y + 12, 210, 21),
+                world.ArchiveGate.IsOpen ? "ARŞİV KAPISI: AÇIK" : "ARŞİV KAPISI: KİLİTLİ",
+                heading, world.ArchiveGate.IsOpen ? Green : Yellow);
+            string instruction = world.ArchiveGate.IsOpen
+                ? "Geçiş onaylandı. Esc ile konuşmayı kapatıp arşivden ilerle."
+                : "Acil durumu ve insanları nereye, nasıl tahliye edeceğini yaz.";
+            Label(new Rect(x + 16, y + 37, w - 32, 21), instruction, small, Muted);
 
             string answer = dialogue.Busy ? $"Yanıt bekleniyor… {dialogue.WaitingTime:0.0} sn" :
                 !string.IsNullOrEmpty(dialogue.Response)
-                    ? (dialogue.HasError ? "Bağlantı: " : "Sera: ") + dialogue.Response
-                    : "Sera yanıtını bekliyor.";
-            if (world.ArchiveGate.IsOpen) answer += "\nArşiv kapısı açık. Esc ile dön, çıkışa ilerle.";
-            else if (!dialogue.Busy && !dialogue.HasError && !string.IsNullOrEmpty(dialogue.Response))
-                answer += "\nArşiv kapısı kilitli.";
-            // Long free-form replies remain readable without covering the station view.
-            float contentWidth = w - 63;
-            float inputHeight = string.IsNullOrEmpty(dialogue.LastInput) ? 0 :
-                text.CalcHeight(new GUIContent("Sen: " + dialogue.LastInput), contentWidth) + 12;
-            float answerHeight = text.CalcHeight(new GUIContent(answer), contentWidth) + 12;
+                    ? (dialogue.HasError ? "Bağlantı: " : "") + dialogue.Response
+                    : "Henüz yanıt yok.";
+            float playerWidth = (w - 52) * .36f;
+            float replyWidth = w - 52 - playerWidth;
+            float replyX = x + 36 + playerWidth;
+            Label(new Rect(x + 16, y + 60, playerWidth, 20), "SENİN MESAJIN", heading, Yellow);
+            Label(new Rect(replyX, y + 60, replyWidth, 20), "SERA'NIN CEVABI", heading, Yellow);
+            Fill(new Rect(x + 16, y + 81, playerWidth, 83), new Color(.11f, .12f, .11f));
+            Fill(new Rect(replyX, y + 81, replyWidth, 83), new Color(.11f, .12f, .11f));
+            if (displayedInput != dialogue.LastInput)
+            {
+                displayedInput = dialogue.LastInput;
+                playerMessageScroll = Vector2.zero;
+            }
             if (displayedReply != dialogue.Response)
             {
                 displayedReply = dialogue.Response;
-                chatScroll.y = inputHeight;
+                chatScroll = Vector2.zero;
             }
-            chatScroll = GUI.BeginScrollView(new Rect(x + 21, y + 98, w - 42, 140), chatScroll,
-                new Rect(0, 0, contentWidth, Mathf.Max(137, inputHeight + answerHeight)));
-            if (inputHeight > 0)
-                Label(new Rect(0, 0, contentWidth, inputHeight), "Sen: " + dialogue.LastInput, text, Muted);
-            Label(new Rect(0, inputHeight, contentWidth, answerHeight), answer, text, dialogue.HasError ? Amber : Cream);
-            GUI.EndScrollView();
+            DrawChatMessage(new Rect(x + 22, y + 84, playerWidth - 12, 77),
+                string.IsNullOrEmpty(dialogue.LastInput) ? "Henüz mesaj göndermedin." : dialogue.LastInput,
+                ref playerMessageScroll, Cream);
+            DrawChatMessage(new Rect(replyX + 6, y + 84, replyWidth - 12, 77), answer,
+                ref chatScroll, dialogue.HasError || dialogue.Busy ? Amber : Cream);
 
             Event current = Event.current;
             bool enter = current.type == EventType.KeyDown &&
                 (current.keyCode == KeyCode.Return || current.keyCode == KeyCode.KeypadEnter);
             if (enter) current.Use();
             GUI.SetNextControlName("npc_input");
-            input = GUI.TextField(new Rect(x + 21, y + 250, w - 157, 38), input, 320, inputStyle);
+            input = GUI.TextField(new Rect(x + 16, y + 174, w - 152, 34), input, 320, inputStyle);
             if (focus)
             {
                 GUI.FocusControl("npc_input");
@@ -252,7 +266,7 @@ namespace KuleNobeti
 
             bool previous = GUI.enabled;
             GUI.enabled = !dialogue.Busy && !world.ArchiveGate.IsOpen && !string.IsNullOrWhiteSpace(input);
-            bool click = GUI.Button(new Rect(x + w - 125, y + 250, 104, 38), "Gönder", button);
+            bool click = GUI.Button(new Rect(x + w - 124, y + 174, 108, 34), "Gönder", button);
             if (GUI.enabled && (click || enter))
             {
                 dialogue.Send(input);
@@ -264,10 +278,20 @@ namespace KuleNobeti
                 focus = true;
             }
             GUI.enabled = previous;
-            Label(new Rect(x + 21, y + 295, w - 42, 21), "Enter: gönder     Esc: konuşmayı kapat", small, Cream);
-            Label(new Rect(x + 21, y + 321, w - 42, 21),
+            Label(new Rect(x + 16, y + 212, 340, 19), "Enter: gönder     Esc: konuşmayı kapat", small, Cream);
+            Label(new Rect(x + 370, y + 212, w - 386, 19),
                 $"Yerel model: {model}" + (dialogue.Latency > 0 && !dialogue.Busy
                     ? $"   /   Yanıt süresi: {dialogue.Latency:0.00} sn" : ""), small, Muted);
+        }
+
+        private void DrawChatMessage(Rect viewport, string message, ref Vector2 scroll, Color color)
+        {
+            float contentWidth = viewport.width - 18;
+            float contentHeight = Mathf.Max(viewport.height - 1,
+                text.CalcHeight(new GUIContent(message), contentWidth) + 4);
+            scroll = GUI.BeginScrollView(viewport, scroll, new Rect(0, 0, contentWidth, contentHeight));
+            Label(new Rect(0, 0, contentWidth, contentHeight), message, text, color);
+            GUI.EndScrollView();
         }
 
         private void DrawFinish(float width, float height)

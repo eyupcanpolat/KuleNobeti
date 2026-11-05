@@ -1,0 +1,21 @@
+﻿Kule Nobeti / visual finish inspection
+UTC: 2026-11-05T16:20:42.5648867Z
+Progress: Completed
+Existing runtime scene; original NavMesh agent and sensor route. No synthetic door, task or dialogue state.
+Main-camera screenshots use view-only player repositioning. Archive screenshot bypasses walking solely for visual inspection; it is not a gameplay clearance test.
+Detail screenshots use a temporary review camera; game camera settings are untouched. Native keys, animation and Windows EXE are not tested here.
+native-keys | UNTESTED | Physical keyboard events are not synthesized.
+fresh-scene | PASS | Actual Unity Play mode.
+visual-only-roots | PASS | Actual Unity Play mode.
+original-body-and-sensor-transforms | PASS | Actual Unity Play mode.
+textured-surfaces | PASS | Actual Unity Play mode.
+capture-initial-main-camera | PASS | Actual Unity Play mode.
+capture-technician-detail | PASS | Actual Unity Play mode.
+capture-robot-detail | PASS | Actual Unity Play mode.
+actual-tunnel-switch-route | PASS | Actual Unity Play mode.
+capture-service-equipment | PASS | Actual Unity Play mode.
+capture-ventilation-main-camera | PASS | Actual Unity Play mode.
+capture-radio-main-camera | PASS | Actual Unity Play mode.
+capture-sera-main-camera | PASS | Actual Unity Play mode.
+capture-sera-detail | PASS | Actual Unity Play mode.
+capture-archive-main-camera | PASS | Actual Unity Play mode.

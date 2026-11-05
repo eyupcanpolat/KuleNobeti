@@ -1,0 +1,22 @@
+﻿Kule Nöbeti / Unity integrated station flow checks
+UTC: 2026-11-05T15:58:47.4785411Z
+Progress: Completed
+Real Play mode; no door, finish, client or policy replacement. Optional helper movement uses CharacterController.Move, not physical WASD.
+Hazard assertions cover live hazard state/clearance; a native WASD speed measurement remains manual.
+scene | PASS | Completed in Unity Play mode.
+panel-access | PASS | Completed in Unity Play mode.
+route-F1 | PASS | Completed in Unity Play mode.
+capture-service | PASS | Completed in Unity Play mode.
+ollama-0 | PASS | Completed in Unity Play mode.
+finish-0 | PASS | Completed in Unity Play mode.
+reset-after-0 | PASS | Completed in Unity Play mode.
+route-F2 | PASS | Completed in Unity Play mode.
+panels | PASS | Completed in Unity Play mode.
+capture-panels | PASS | Completed in Unity Play mode.
+ollama-2 | PASS | Completed in Unity Play mode.
+finish-2 | PASS | Completed in Unity Play mode.
+capture-finish | PASS | Completed in Unity Play mode.
+reset-after-2 | PASS | Completed in Unity Play mode.
+route-F3 | PASS | Completed in Unity Play mode.
+reset-after-F3 | PASS | Completed in Unity Play mode.
+native-keys | UNTESTED | Physical keys were not synthesized. Production handlers were invoked directly.
