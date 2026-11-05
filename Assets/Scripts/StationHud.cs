@@ -111,11 +111,13 @@ namespace KuleNobeti
 
             if (diagnostics)
             {
-                Panel(new Rect(width - 329, 22, 307, 104));
+                Panel(new Rect(width - 329, 22, 307, 122));
                 var sensor = companion.Sensor;
-                string obstacle = float.IsInfinity(sensor.ObstacleDistance) ? "yok" : $"{sensor.ObstacleDistance:0.00} m";
-                Label(new Rect(width - 315, 32, 283, 84),
-                    $"Durum: {companion.State}\nEngel: {obstacle}  |  Açı: {sensor.TargetAngle:0}°\nŞalter: {sensor.TargetDistance:0.00} m",
+                string obstacle = float.IsInfinity(sensor.ObstacleDistance) ? "yok" :
+                    $"{sensor.ObstacleDistance:0.00} m / {sensor.ObstacleAngle:+0;-0;0}°";
+                Label(new Rect(width - 315, 32, 283, 101),
+                    $"Durum: {companion.State}\nKonum: {sensor.Position.x:0.0}, {sensor.Position.z:0.0}\n" +
+                    $"Engel: {obstacle}\nŞalter: {sensor.TargetDistance:0.00} m / {sensor.TargetAngle:0}°",
                     text, Mint);
             }
 

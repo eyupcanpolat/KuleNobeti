@@ -19,8 +19,8 @@ namespace KuleNobeti
         private Door gate;
         private float started, nextFollow, nextRepath;
         private int repaths;
-        private bool measuring;
-        private Vector3 previousDestination;
+        private bool measuring, awaitingTestOrder;
+        private Vector3 previousDestination, activeGoal, orderStart;
 
         private void Awake()
         {
@@ -47,7 +47,7 @@ namespace KuleNobeti
             State = Phase.Following;
             Status = "Başlangıç değiştirildi";
             Elapsed = 0;
-            nextFollow = Time.time + 2f;
+            awaitingTestOrder = true;
             return true;
         }
 
@@ -57,6 +57,8 @@ namespace KuleNobeti
             started = Time.time;
             Elapsed = 0;
             measuring = true;
+            awaitingTestOrder = false;
+            orderStart = transform.position;
             repaths = 0;
             nextRepath = Time.time + 1f;
             PlanRoute();
@@ -79,6 +81,7 @@ namespace KuleNobeti
                 Fail("Şaltere ulaşan geçerli rota bulunamadı.");
                 return;
             }
+            activeGoal = goal.position;
             State = Phase.GoingToSwitch;
             Status = "Servis tünelinden şaltere gidiyor";
         }
@@ -102,18 +105,17 @@ namespace KuleNobeti
                     break;
                 case Phase.GoingToSwitch:
                     if (!agent.isOnNavMesh) { Fail("Ajan rotadan çıktı."); break; }
-                    if (!agent.pathPending && agent.pathStatus != NavMeshPathStatus.PathComplete)
-                    {
-                        Fail("Rota artık erişilebilir değil.");
-                        break;
-                    }
-                    if (!agent.pathPending && (transform.position - usePoint).sqrMagnitude < .25f)
+                    if (!agent.pathPending && (transform.position - activeGoal).sqrMagnitude < .25f)
                     {
                         agent.ResetPath();
                         State = Phase.Aligning;
                         Status = "Sensör şalteri doğruluyor";
                     }
-                    else if (Sensor.ObstacleDistance < .65f && agent.velocity.sqrMagnitude < .06f &&
+                    else if (!agent.pathPending && agent.pathStatus != NavMeshPathStatus.PathComplete)
+                    {
+                        Fail("Rota artık erişilebilir değil.");
+                    }
+                    else if (Sensor.ForwardObstacleDistance < .65f && agent.velocity.sqrMagnitude < .06f &&
                              repaths < 2 && Time.time >= nextRepath)
                     {
                         repaths++;
@@ -132,6 +134,7 @@ namespace KuleNobeti
                         measuring = false;
                         State = Phase.Succeeded;
                         Status = "Şalter etkin: fiziksel kapı açık";
+                        Debug.Log($"K-07 başlangıç {orderStart:F2}: şalter doğrulandı, {Elapsed:0.00} sn.");
                     }
                     break;
             }
@@ -139,7 +142,7 @@ namespace KuleNobeti
 
         private void FollowPlayer()
         {
-            if (!agent.isOnNavMesh || Time.time < nextFollow) return;
+            if (awaitingTestOrder || !agent.isOnNavMesh || Time.time < nextFollow) return;
             nextFollow = Time.time + .35f;
             if ((player.position - transform.position).sqrMagnitude < 3.2f) return;
             if (!NavMesh.SamplePosition(player.position, out NavMeshHit hit, 2.4f, agent.areaMask)) return;
@@ -154,6 +157,7 @@ namespace KuleNobeti
             measuring = false;
             State = Phase.Failed;
             Status = reason;
+            Debug.LogWarning($"K-07 başlangıç {orderStart:F2}: {reason} ({Elapsed:0.00} sn).");
         }
     }
 }
