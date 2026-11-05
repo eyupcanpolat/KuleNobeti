@@ -1,0 +1,9 @@
+{
+  "type": "object",
+  "properties": {
+    "reply": { "type": "string" },
+    "action": { "type": "string", "enum": ["none", "open_gate"] }
+  },
+  "required": ["reply", "action"],
+  "additionalProperties": false
+}
