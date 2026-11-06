@@ -1,7 +1,7 @@
 # Kule Nöbeti
 
 **Kocaeli Üniversitesi · Yazılım Geliştirme Laboratuvarı-I · Grup 10 · Proje 1**  
-**Ekip:** Eyüp CANPOLAT - 221307011 · Yusuf Emir ALTAY - 221307048
+**Ekip:** Eyüp CANPOLAT - 221307011 · Yusuf Emir ALTAY - 221307048       
 **Tarih:** 5 Kasım 2026  
 **Ortak GitHub reposu:** [eyupcanpolat/KuleNobeti](https://github.com/eyupcanpolat/KuleNobeti)
 
