@@ -2,9 +2,8 @@
 
 **Kocaeli Üniversitesi · Yazılım Geliştirme Laboratuvarı-I · Grup 10 · Proje 1**  
 **Ekip:** Eyüp CANPOLAT - 221307011 · Yusuf Emir ALTAY - 221307048
-
 **Tarih:** 5 Kasım 2026  
-**Ortak GitHub deposu:** [eyupcanpolat/KuleNobeti](https://github.com/eyupcanpolat/KuleNobeti)
+**Ortak GitHub reposu:** [eyupcanpolat/KuleNobeti](https://github.com/eyupcanpolat/KuleNobeti)
 
 ## 1. Amaç ve oyun senaryosu
 
