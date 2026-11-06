@@ -1,8 +1,11 @@
 # Kule Nöbeti
 
-**Kocaeli Üniversitesi · Yazılım Geliştirme Laboratuvarı-I · Grup 10 · Proje 1**  
-**Ekip:** Eyüp CANPOLAT - 221307011 · Yusuf Emir ALTAY - 221307048       
-**Tarih:** 5 Kasım 2026  
+**Kocaeli Üniversitesi · Yazılım Geliştirme Laboratuvarı-I · Grup 10 · Proje 1**
+
+**Ekip:** Eyüp CANPOLAT - 221307011 · Yusuf Emir ALTAY - 221307048
+
+**Tarih:** 6 Kasım 2026
+
 **Ortak GitHub reposu:** [eyupcanpolat/KuleNobeti](https://github.com/eyupcanpolat/KuleNobeti)
 
 ## 1. Amaç ve oyun senaryosu
@@ -176,6 +179,24 @@ Testi tekrarlamak için F8 ile oyunu sıfırla, Q ile ilk kapıyı aç, nöbetç
 
 **Güncel build kontrolleri.** [Ollama kapalıyken uyarı](docs/04-ollama-kapali.png) · [Kuralı atlatma girişiminde kapı kilitli](docs/05-komut-sizdirma.png)
 
+### 6 Kasım 2026 — son kaynak ve teslim build'i
+
+Son kaynak Unity **6000.0.58f2**, yerel **qwen2.5:3b (Q4_K_M)** ile yeniden doğrulandı. **27 kontrol geçti**: gerçek NavMesh/sensör, JSON ve tahliye kuralı, beş farklı üretim diyaloğu, 0/2 ve 2/2 görevle gerçek CharacterController hareketiyle bitiş, sıfırlamalar ve hata yolları. Bu sayı 27 ayrı PDF isterine karşılık gelmez. Ayrıntılı gerçek cevaplar, ham JSON'lar, gecikmeler ve kontrol kapsamı [son doğrulama raporunda](docs/son-teslim/dogrulama.md) ve [ham kayıtta](docs/son-teslim/dogrulama.json) bulunur. Testler sahte kapı/ajan/model yanıtı kullanmaz; üretim komutlarını çağırır, fiziksel klavyeyi taklit etmez.
+
+| Başlangıç | Başarı / deneme | Şalter süresi |
+| --- | ---: | ---: |
+| F1 | 1 / 1 | 5,06 sn |
+| F2 | 1 / 1 | 6,47 sn |
+| F3 | 1 / 1 | 4,09 sn |
+
+Üç başlangıçta **3/3 başarı**, ortalama **5,21 sn**. İki görevli ikinci akışın ek F1 denemesi bu ortalamaya dahil edilmez. Selamlama, tehdit, alakasız film sorusu ve komut sızdırmada gerçek `none` yanıtı ile arşiv kilitli kaldı; geçerli tahliye planında gerçek `open_gate` yanıtıyla açıldı. İkinci görev durumunda da canlı modelle bitiş gerçekleşti. İlk soğuk model isteği **11,67 sn** sürerken **213 oyun karesi** ilerledi; bekleme oyun döngüsünü dondurmadı.
+
+Hata kapsamı: gerçek Ollama sunucusunda var olmayan model için HTTP 404 doğrulandı. Bağlantının kesilmesi, bozuk JSON ve **5,03 sn** zaman aşımı ise üretim istemcisine bağlanan, yalnız hata üreten yerel test sunucusuyla denendi. Bunlar normal NPC yanıtı yerine geçmez ve gerçek Ollama sunucusunu kapatma testi olarak sunulmaz. Hata sonrasında kapı açılmadı ve kare döngüsü ilerledi.
+
+Son Windows çıktısı **`Builds/Windows-Istasyon/20261106-164607/`**. Bu EXE ayrıca açıldı: güncel görseller, **F4 sensör ekranı**, **Q ile 5,47 sn'de fiziksel kapının açılması** ve **F8 ile sıfırlama** gözlendi. [EXE açılış](docs/son-teslim/01-windows-baslangic.png), [şalter](docs/son-teslim/02-windows-salter.png), [sıfırlama](docs/son-teslim/03-windows-sifirlama.png). Bu son EXE içinde E/Enter/F ve iki tam bitişin fiziksel klavyeyle yeniden yapılması bu kayıtta doğrulanmış sayılmaz; bu akışlar aynı kaynakla Unity üretim işlevleri üzerinden geçti.
+
+Model metni için kalan sınır: selamlamada model “arşivin açık kalır” ifadesini kullansa da yapılandırılmış eylem `none`, gerçek kapı durumu kilitliydi. Eylem/kapı doğrulamasının geçmesi, modelin bütün cümlelerinin anlam bakımından kusursuz olduğu anlamına gelmez. Beş yanıt değiştirilmeden ham kayıtta korunmuştur.
+
 ## 6. Sonuç ve tartışma
 
 K-07 üç farklı başlangıçtan kendi rotasını izleyerek şalteri çalıştırdı. Yerel model geçerli tahliye planıyla ilerlemeyi sağladı. Güncel Windows build'inde Ollama kapalıyken bağlantı hatası gösterildi; sunucu geri gelince oyun yeniden başlatılmadan tahliye tamamlandı.
@@ -186,6 +207,6 @@ Test kapsamı tek sahne, tek model ve her ajan başlangıcı için bir denemeyle
 
 - Unity'de **YazLab → 4 - Windows Build Al**. Yeni önizleme çıktısı `Builds/Windows-Istasyon/<tarih-saat>/KuleNobeti.exe`; önceden test edilmiş `Builds/Windows` korunur. EXE, yanındaki `UnityPlayer.dll`, `KuleNobeti_Data` ve üretilen diğer dosyalarla birlikte çalışır. Ollama ve model ayrı kurulur. Oyun yerel model kurulu değilken hata gösterir; diyalogla bitiş için gerçek sunucu ve model gereklidir.
 - Ortak GitHub reposuna `Assets` ve `.meta` dosyaları, `Packages`, `ProjectSettings`, `docs` ve tamamlanmış `README.md` girer. Ekip üyeleri kendi gerçek katkılarını kendi hesaplarından anlamlı commit'lerle paylaşır.
-- Proje kökünde `powershell -NoProfile -ExecutionPolicy Bypass -File .\Tools\TeslimPaketi.ps1` çalıştır. Üst klasöre `KuleNobeti_YazLab_Teslim.zip` üretir. Bu betik hâlâ önceden test edilmiş **Builds/Windows** klasörünü paketler; yeni önizleme otomatik olarak teslim yerine geçmez. Tek ZIP'te kaynak proje, rapor ve ekran görüntüleri ile tam Windows build bulunur. Son gönderimden önce ZIP'i açıp içeriklerini doğrula.
+- Proje kökünde `powershell -NoProfile -ExecutionPolicy Bypass -File .\Tools\TeslimPaketi.ps1 -BuildPath "Builds/Windows-Istasyon/20261106-164607"` çalıştır. Build klasörünü açıkça seçmek zorunludur; eski build otomatik seçilmez. Tarihli teslim ZIP'i `Builds/Teslim/` altında üretilir. Kaynak proje, README, test kanıtları ve seçilen tam Windows build birlikte paketlenir. ZIP yeniden açılır; içindeki her dosyanın SHA256 değeri `TeslimBilgisi.json` manifestiyle doğrulanır. Mevcut ZIP ve eski `Builds/Windows` üzerine yazılmaz.
 
 [PDF isterleri ve teslim kontrol listesi](docs/TeslimKontrol.md).
