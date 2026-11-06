@@ -1,7 +1,7 @@
 # Kule Nöbeti
 
-**Kocaeli Üniversitesi · Yazılım Geliştirme Laboratuvarı-I · Proje 1**  
-**Ekip:** [DOLDUR] — ad, soyad ve öğrenci numaraları  
+**Kocaeli Üniversitesi · Yazılım Geliştirme Laboratuvarı-I · Grup 10 · Proje 1**  
+**Ekip:** Eyüp CANPOLAT - 221307011 · Yusuf Emir ALTAY - 221307048
 **Tarih:** 5 Kasım 2026  
 **Ortak GitHub deposu:** [eyupcanpolat/KuleNobeti](https://github.com/eyupcanpolat/KuleNobeti)
 
@@ -188,4 +188,4 @@ Test kapsamı tek sahne, tek model ve her ajan başlangıcı için bir denemeyle
 - Ortak GitHub reposuna `Assets` ve `.meta` dosyaları, `Packages`, `ProjectSettings`, `docs` ve tamamlanmış `README.md` girer. Ekip üyeleri kendi gerçek katkılarını kendi hesaplarından anlamlı commit'lerle paylaşır.
 - Proje kökünde `powershell -NoProfile -ExecutionPolicy Bypass -File .\Tools\TeslimPaketi.ps1` çalıştır. Üst klasöre `KuleNobeti_YazLab_Teslim.zip` üretir. Bu betik hâlâ önceden test edilmiş **Builds/Windows** klasörünü paketler; yeni önizleme otomatik olarak teslim yerine geçmez. Tek ZIP'te kaynak proje, rapor ve ekran görüntüleri ile tam Windows build bulunur. Son gönderimden önce ZIP'i açıp içeriklerini doğrula.
 
-Ekip için [PDF isterleri ve teslim kontrol listesi](docs/TeslimKontrol.md).
+[PDF isterleri ve teslim kontrol listesi](docs/TeslimKontrol.md).
